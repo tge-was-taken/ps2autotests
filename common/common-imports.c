@@ -3,6 +3,7 @@
 #include "intrman.h"
 #include "stdio.h"
 #include "sysclib.h"
+#include "sysmem.h"
 #include "thsemap.h"
 
 // What the shared harness needs.  A module a test imports for itself belongs
@@ -36,6 +37,17 @@ I_CpuDisableIntr
 I_CpuEnableIntr
 I_QueryIntrContext
 intrman_IMPORTS_end
+
+sysmem_IMPORTS_start
+I_AllocSysMemory
+I_FreeSysMemory
+I_QueryMemSize
+I_QueryMaxFreeMemSize
+I_QueryTotalFreeMemSize
+I_QueryBlockTopAddress
+I_QueryBlockSize
+I_Kprintf
+sysmem_IMPORTS_end
 
 thsemap_IMPORTS_start
 I_CreateSema
