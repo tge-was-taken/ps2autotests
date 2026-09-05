@@ -1,0 +1,11 @@
+
+loadcore_IMPORTS_start
+I_RegisterLibraryEntries
+I_ReleaseLibraryEntries
+I_QueryBootMode
+I_QueryLibraryEntryTable
+loadcore_IMPORTS_end
+
+thbase_IMPORTS_start
+I_DelayThread
+thbase_IMPORTS_end

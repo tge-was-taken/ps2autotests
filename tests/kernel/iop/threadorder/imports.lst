@@ -1,0 +1,15 @@
+
+thbase_IMPORTS_start
+I_CreateThread
+I_DeleteThread
+I_StartThread
+I_TerminateThread
+I_DelayThread
+I_SleepThread
+I_WakeupThread
+I_GetThreadId
+I_ChangeThreadPriority
+I_RotateThreadReadyQueue
+I_ReferThreadStatus
+I_ReleaseWaitThread
+thbase_IMPORTS_end

@@ -1,0 +1,12 @@
+
+thbase_IMPORTS_start
+I_SetAlarm
+I_CancelAlarm
+I_DelayThread
+I_GetSystemTime
+I_USec2SysClock
+I_SysClock2USec
+I_GetThreadId
+I_SleepThread
+I_WakeupThread
+thbase_IMPORTS_end
