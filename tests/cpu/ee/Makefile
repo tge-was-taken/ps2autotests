@@ -1,4 +1,4 @@
-TARGETS = alu branch branchdelay lsu lsudelay muldiv
+TARGETS = alu branch branchdelay cache hilodelay intdelay lsu lsudelay muldiv unaligned trap branch2 shortloop tlb
 EE_LIBS =
 
 COMMON_DIR=../../../common
