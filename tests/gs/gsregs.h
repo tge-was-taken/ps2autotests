@@ -20,6 +20,7 @@ namespace GS
 	
 	static volatile u64 *const CSR = (volatile u64 *)0x12001000;
 	static volatile u64 *const SIGLBLID = (volatile u64 *)0x12001080;
+	static volatile u64 *const BUSDIR = (volatile u64 *)0x12001040;
 }
 
 #endif
