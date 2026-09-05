@@ -1,4 +1,4 @@
-TARGETS = cpcond tagintr
+TARGETS = chain cpcond registers tagintr stat mfifo stall error
 EXTRA_OBJS = ../dmatags.o ../dmasend.o
 EE_LIBS = -lg -ldma
 
