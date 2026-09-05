@@ -11,20 +11,21 @@
 # Define pefixes for the various toolchain binaries.
 include $(COMMON_DIR)/common-defines.mk
 
-ASFLAGS_TARGET = -mcpu=r3000
-
-CFLAGS_TARGET  = -miop
+# -miop is gone from the toolchain, and the irx is now assembled from a
+# relocatable link plus iopfixup rather than by the linker alone.
+CFLAGS_TARGET  = -D_IOP -fno-builtin -msoft-float -mno-explicit-relocs
 ASFLAGS_TARGET = -march=r3000
-LDFLAGS_TARGET = -miop
+LDFLAGS_TARGET =
+IOP_FIXUP = $(PS2SDK)/bin/iopfixup
 
 # include dir
 IOP_INCS := -I$(PS2SDK)/iop/include -I$(PS2SDK)/common/include -I$(COMMON_DIR) \
 	-I. $(IOP_INCS)
 # C compiler flags
-IOP_CFLAGS := $(CFLAGS_TARGET) -O2 -G0 $(IOP_INCS) $(IOP_CFLAGS)
+IOP_CFLAGS := $(CFLAGS_TARGET) -O2 -G0 -fno-toplevel-reorder $(IOP_INCS) $(IOP_CFLAGS)
 
 # linker flags
-IOP_LDFLAGS := $(LDFLAGS_TARGET) -nostdlib -L$(PS2SDK)/iop/lib $(IOP_LDFLAGS)
+IOP_LDFLAGS := $(LDFLAGS_TARGET) -nostdlib -dc -r -T$(PS2SDK)/iop/startup/linkfile -L$(PS2SDK)/iop/lib $(IOP_LDFLAGS)
 
 # asssembler flags
 IOP_ASFLAGS := $(ASFLAGS_TARGET) -EL -G0 $(IOP_ASFLAGS)
@@ -32,7 +33,7 @@ IOP_ASFLAGS := $(ASFLAGS_TARGET) -EL -G0 $(IOP_ASFLAGS)
 # link with following libraries (libs need to be defined multiple times in order for linking to work!!)
 IOP_LIBS += -lkernel -lgcc
 
-EXTRA_OBJS += $(COMMON_DIR)/common-iop.o $(COMMON_DIR)/xprintf.o
+EXTRA_OBJS += $(COMMON_DIR)/common-iop.o $(COMMON_DIR)/xprintf.o $(COMMON_DIR)/common-imports.o
 
 # Externally defined variables: IOP_BIN, IOP_OBJS, IOP_LIB
 
@@ -48,15 +49,16 @@ EXTRA_OBJS += $(COMMON_DIR)/common-iop.o $(COMMON_DIR)/xprintf.o
 %.o : %.lst
 	echo "#include \"irx_imports.h\"" > build-imports.c
 	cat $< >> build-imports.c
-	$(IOP_CC) $(IOP_CFLAGS) -c build-imports.c -o $@
+	$(IOP_CC) $(IOP_CFLAGS) -fno-toplevel-reorder -c build-imports.c -o $@
 	rm -f build-imports.c
 
 %.irx : %.o $(EXTRA_OBJS)
-	$(IOP_CC) $(IOP_LDFLAGS) -o $@ $< $(EXTRA_OBJS) $(IOP_LIBS)
+	$(IOP_CC) $(IOP_LDFLAGS) -o $*.linked $< $(EXTRA_OBJS) $(IOP_LIBS)
+	$(IOP_FIXUP) --rb --irx1 --allow-zero-text -o $@ $*.linked
 
 all: $(TARGETS:=.irx)
 
 clean:
-	-$(RM) -f $(TARGETS:=.irx) $(TARGETS:=.o)
+	-$(RM) -f $(TARGETS:=.irx) $(TARGETS:=.o) $(TARGETS:=.linked)
 
 rebuild: clean all

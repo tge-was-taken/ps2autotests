@@ -1,2 +1,5 @@
 *.o
 *.result
+*.linked
+build-imports.c
+*.pcsx2
