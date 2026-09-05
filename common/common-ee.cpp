@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <kernel.h>
 
 //Kernel tests will add and substract values as big as 0x20 to test thread priority, 
@@ -12,6 +14,24 @@
 char schedfBuffer[65536];
 unsigned int schedfBufferPos = 0;
 
+static int outputFd = -1;
+
+static void emit(const char *text) {
+	printf("%s", text);
+	if (outputFd >= 0) {
+		write(outputFd, text, strlen(text));
+	}
+}
+
+void testPrintf(const char *format, ...) {
+	static char line[16384];
+	va_list args;
+	va_start(args, format);
+	vsnprintf(line, sizeof(line), format, args);
+	va_end(args);
+	emit(line);
+}
+
 void schedf(const char *format, ...) {
 	va_list args;
 	va_start(args, format);
@@ -20,7 +40,7 @@ void schedf(const char *format, ...) {
 }
 
 void flushschedf() {
-	printf("%s", schedfBuffer);
+	emit(schedfBuffer);
 	schedfBuffer[0] = '\0';
 	schedfBufferPos = 0;
 }
@@ -48,9 +68,30 @@ void testThreadProc() {
 	SignalSema(g_testThreadDoneSema);
 }
 
+// A console without a host to print to still has somewhere to put the output.
+// TEST_OUTPUT_FILE names it at build time, -o<path> on the command line wins.
+static const char *outputPath(int argc, char *argv[]) {
+#ifdef TEST_OUTPUT_FILE
+	const char *path = TEST_OUTPUT_FILE;
+#else
+	const char *path = NULL;
+#endif
+	for (int i = 1; i < argc; ++i) {
+		if (strncmp(argv[i], "-o", 2) == 0 && argv[i][2] != '\0') {
+			path = argv[i] + 2;
+		}
+	}
+	return path;
+}
+
 int main(int argc, char *argv[]) {
 	//A thread is created to ensure the execution environment is the same
 	//across all possible boot methods (direct hw boot, ps2link, emulator, etc.)
+	
+	const char *path = outputPath(argc, argv);
+	if (path != NULL) {
+		outputFd = open(path, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+	}
 	
 	ee_sema_t semaInfo;
 	memset(&semaInfo, 0, sizeof(ee_sema_t));
@@ -70,6 +111,11 @@ int main(int argc, char *argv[]) {
 	
 	StartThread(testThreadId, NULL);
 	WaitSema(g_testThreadDoneSema);
+	
+	if (outputFd >= 0) {
+		close(outputFd);
+		outputFd = -1;
+	}
 	
 	return 0;
 }

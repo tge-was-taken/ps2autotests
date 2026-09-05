@@ -17,6 +17,11 @@
 void schedf(const char *format, ...);
 void flushschedf();
 
+// Writes to stdout, and to the capture file when one was opened.  Named printf
+// so a test needs no ceremony, and so the tests that predate it are unchanged.
+void testPrintf(const char *format, ...);
+#define printf testPrintf
+
 int getThreadPriority(int threadId);
 
 #endif
