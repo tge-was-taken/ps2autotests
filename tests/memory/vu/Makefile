@@ -1,5 +1,5 @@
-TARGETS = default spr mirrors
-EE_LIBS = -lg
+TARGETS = mirrors
+EE_LIBS =
 
 COMMON_DIR=../../../common
 include $(COMMON_DIR)/common-ee.mk
