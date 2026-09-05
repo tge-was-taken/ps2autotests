@@ -22,16 +22,16 @@ void appendResult(u32 result) {
 	}
 }
 
-template <s32 number, s32 returnValue>
-s32 intcHandler(s32 cause) {
+template <int number, unsigned int returnValue>
+int intcHandler(int cause) {
 	appendResult(number);
-	return returnValue;
+	return (int)returnValue;
 }
 
-template <s32 returnValue>
-s32 intcHandlerWithParam(s32 cause, void *arg, void *addr) {
+template <unsigned int returnValue>
+int intcHandlerWithParam(int cause, void *arg, void *addr) {
 	appendResult((u32)arg);
-	return returnValue;
+	return (int)returnValue;
 }
 
 void initializeTest() {
@@ -147,7 +147,7 @@ void cancelTest() {
 	printf("cancel: ");
 	initializeTest();
 	addTestIntcHandler(&intcHandler<1, 0>,  -1);
-	addTestIntcHandler(&intcHandler<2, -1>, -1);
+	addTestIntcHandler(&intcHandler<2, 0xFFFFFFFF>, -1);
 	addTestIntcHandler(&intcHandler<3, 0>,  -1);
 	waitForTestResults();
 	finishTest();

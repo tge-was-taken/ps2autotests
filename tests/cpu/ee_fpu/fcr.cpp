@@ -6,10 +6,10 @@ void __attribute__((noinline)) printfcrs(const char *title, int all) {
 	memset(fcrs, 0xCC, sizeof(fcrs));
 
 #define ASM_READ_FCR(R) \
-		"lui $t0, 0\n" \
-		"cfc1 $t0, $" #R "\n" \
+		"lui $8, 0\n" \
+		"cfc1 $8, $" #R "\n" \
 		"nop\n" \
-		"sw $t0, 4 * " #R "(%0)\n"
+		"sw $8, 4 * " #R "(%0)\n"
 
 	asm volatile (
 		".set noreorder\n"
@@ -48,7 +48,7 @@ void __attribute__((noinline)) printfcrs(const char *title, int all) {
 		ASM_READ_FCR(31)
 
 		".set    reorder\n"
-		: : "r"(fcrs) : "t0"
+		: : "r"(fcrs) : "$8"
 	);
 
 	printf("%s:\n  ", title);

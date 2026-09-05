@@ -1,6 +1,8 @@
 #include <thbase.h>
 #include <thmsgbx.h>
 #include "mbx-common.h"
+#include <sysclib.h>
+#include <stdio.h>
 
 u32 getThreadPriority(s32 threadId) {
 	iop_thread_info_t threadInfo = {};

@@ -1,5 +1,6 @@
 #include <thbase.h>
 #include "thread-common.h"
+#include <sysclib.h>
 
 s32 getThreadPriority(s32 threadId) {
 	iop_thread_info_t threadStat;

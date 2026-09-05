@@ -1,5 +1,6 @@
 #include <common-iop.h>
 #include <string.h>
+#include <sysclib.h>
 
 const char *getStringRep(const char *str) {
 	return str ? str : "null";

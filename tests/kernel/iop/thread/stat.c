@@ -6,6 +6,7 @@
 #include <thevent.h>
 #include <thmsgbx.h>
 #include "thread-common.h"
+#include <sysclib.h>
 
 #define STACK_SIZE 0x800
 

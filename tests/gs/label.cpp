@@ -18,7 +18,7 @@ void testSetBits() {
 	
 	DMA::SendSimple(DMA::D2, packet.Raw(), packet.Size());
 
-	printf("Set label bits -> SIGLBLID: %016lx\n", *GS::SIGLBLID);
+	printf("Set label bits -> SIGLBLID: %016llx\n", *GS::SIGLBLID);
 }
 
 void testClearBits() {
@@ -35,7 +35,7 @@ void testClearBits() {
 	
 	DMA::SendSimple(DMA::D2, packet.Raw(), packet.Size());
 
-	printf("Clear label bits -> SIGLBLID: %016lx\n", *GS::SIGLBLID);
+	printf("Clear label bits -> SIGLBLID: %016llx\n", *GS::SIGLBLID);
 }
 
 int main(int argc, char *argv[]) {

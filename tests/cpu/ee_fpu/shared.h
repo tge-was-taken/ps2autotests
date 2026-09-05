@@ -20,10 +20,10 @@ static u32 __attribute__((unused)) CF_GARBAGE2[4] = {0xDEADBEEF};
 template <u32 i>
 static inline void SET_U32(register float &fd) {
 	asm volatile (
-		"lui $t6, %1\n"
-		"ori $t6, $t6, %2\n"
-		"mtc1 $t6, %0\n"
-		: "+f"(fd) : "K"((i >> 16) & 0xFFFF), "K"(i & 0xFFFF) : "t6"
+		"lui $14, %1\n"
+		"ori $14, $14, %2\n"
+		"mtc1 $14, %0\n"
+		: "+f"(fd) : "K"((i >> 16) & 0xFFFF), "K"(i & 0xFFFF) : "$14"
 	);
 }
 

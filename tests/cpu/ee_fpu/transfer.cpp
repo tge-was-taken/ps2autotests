@@ -2,9 +2,9 @@
 #include <string.h>
 
 static float CF_PATTERN[3][4] = {
-	{0x45678123, 0x9ABCDEF0, 0xDEADBEEF, 0xC0DE1337},
-	{0x23456789, 0xABCDEF01, 0xBEEFDEAD, 0xC0DEC0DE},
-	{0x8899AABB, 0xCCDDEEFF, 0x00112233, 0x44556677},
+	{(float)0x45678123, (float)0x9ABCDEF0, (float)0xDEADBEEF, (float)0xC0DE1337},
+	{(float)0x23456789, (float)0xABCDEF01, (float)0xBEEFDEAD, (float)0xC0DEC0DE},
+	{(float)0x8899AABB, (float)0xCCDDEEFF, (float)0x00112233, (float)0x44556677},
 };
 
 #define LOADF_OP_FUNC(OP) \
@@ -103,12 +103,12 @@ static void test_cfc1() {
 	// Compiler bug?  Oh well, let's build it manually.
 	register u128 fcr31 = 0x12345678;
 	asm volatile (
-		"dsll32 $t6, %0, 0\n"
-		"or $t6, $t6, %0\n"
-		"pcpyld %0, $t6, $t6\n"
+		"dsll32 $14, %0, 0\n"
+		"or $14, $14, %0\n"
+		"pcpyld %0, $14, $14\n"
 		"cfc1 %0, $31\n"
 		"sync\n"
-		: "+&r"(fcr31) : : "t6"
+		: "+&r"(fcr31) : : "$14"
 	);
 
 	printf("cfc1: ");
@@ -118,7 +118,7 @@ static void test_cfc1() {
 		"cfc1 $0, $31\n"
 		"sync\n"
 		"por %0, $0, $0\n"
-		: "+&r"(fcr31) : : "t6"
+		: "+&r"(fcr31) : : "$14"
 	);
 
 	printf("cfc1 -> $0: ");
@@ -130,14 +130,14 @@ static void test_ctc1() {
 	// Compiler bug?  Oh well, let's build it manually.
 	register u128 fcr31 = 0xFFFFFFFF;
 	asm volatile (
-		"dsll32 $t6, %0, 0\n"
-		"or $t6, $t6, %0\n"
-		"pcpyld %0, $t6, $t6\n"
+		"dsll32 $14, %0, 0\n"
+		"or $14, $14, %0\n"
+		"pcpyld %0, $14, $14\n"
 		"ctc1 %0, $31\n"
 		"sync\n"
 		"cfc1 %0, $31\n"
 		"sync\n"
-		: "+&r"(fcr31) : : "t6"
+		: "+&r"(fcr31) : : "$14"
 	);
 
 	printf("ctc1: ");
@@ -148,12 +148,12 @@ static void test_mfc1() {
 	register float f = -1.0f;
 	register u128 r = 0x0000000080F0000FULL;
 	asm volatile (
-		"dsll32 $t6, %0, 0\n"
-		"or $t6, $t6, %0\n"
-		"pcpyld %0, $t6, $t6\n"
+		"dsll32 $14, %0, 0\n"
+		"or $14, $14, %0\n"
+		"pcpyld %0, $14, $14\n"
 		"mfc1 %0, %1\n"
 		"sync\n"
-		: "+&r"(r) : "f"(f) : "t6"
+		: "+&r"(r) : "f"(f) : "$14"
 	);
 
 	printf("mfc1 negative: ");
@@ -162,12 +162,12 @@ static void test_mfc1() {
 	f = 1.0f;
 	r = 0x0000000000F0000FULL;
 	asm volatile (
-		"dsll32 $t6, %0, 0\n"
-		"or $t6, $t6, %0\n"
-		"pcpyld %0, $t6, $t6\n"
+		"dsll32 $14, %0, 0\n"
+		"or $14, $14, %0\n"
+		"pcpyld %0, $14, $14\n"
 		"mfc1 %0, %1\n"
 		"sync\n"
-		: "+&r"(r) : "f"(f) : "t6"
+		: "+&r"(r) : "f"(f) : "$14"
 	);
 
 	printf("mfc1 positive: ");
@@ -177,7 +177,7 @@ static void test_mfc1() {
 		"mfc1 $0, %1\n"
 		"sync\n"
 		"por %0, $0, $0\n"
-		: "+&r"(r) : "f"(f) : "t6"
+		: "+&r"(r) : "f"(f) : "$14"
 	);
 
 	printf("mfc1 -> $0: ");
@@ -188,12 +188,12 @@ static void test_mtc1() {
 	register float f = 1.0f;
 	register u128 r = 0x0000000080F0000FULL;
 	asm volatile (
-		"dsll32 $t6, %1, 0\n"
-		"or $t6, $t6, %1\n"
-		"pcpyld %1, $t6, $t6\n"
+		"dsll32 $14, %1, 0\n"
+		"or $14, $14, %1\n"
+		"pcpyld %1, $14, $14\n"
 		"mtc1 %1, %0\n"
 		"sync\n"
-		: "+&f"(f) : "r"(r) : "t6"
+		: "+&f"(f) : "r"(r) : "$14"
 	);
 
 	printf("mtc1 negative: ");
@@ -203,14 +203,14 @@ static void test_mtc1() {
 	r = 0x00F0000F;
 
 	asm volatile (
-		"lui $t6, 0xFFFF\n"
-		"ori $t6, $t6, 0xFFFF\n"
-		"dsll32 $t6, $t6, 0\n"
-		"or $t6, $t6, %1\n"
-		"pcpyld %1, $t6, $t6\n"
+		"lui $14, 0xFFFF\n"
+		"ori $14, $14, 0xFFFF\n"
+		"dsll32 $14, $14, 0\n"
+		"or $14, $14, %1\n"
+		"pcpyld %1, $14, $14\n"
 		"mtc1 %1, %0\n"
 		"sync\n"
-		: "+&f"(f) : "r"(r) : "t6"
+		: "+&f"(f) : "r"(r) : "$14"
 	);
 
 	printf("mtc1 positive: ");

@@ -6,12 +6,12 @@ void test_lw_delay() {
 	register u32 res = 0;
 	asm volatile (
 		".set noreorder\n"
-		"lui $t0, 0x1122\n"
-		"ori $t0, $t0, 0x3344\n"
-		"lw $t0, 0(%1)\n"
-		"or %0, $0, $t0\n"
+		"lui $8, 0x1122\n"
+		"ori $8, $8, 0x3344\n"
+		"lw $8, 0(%1)\n"
+		"or %0, $0, $8\n"
 		"sync\n"
-		: "+&r"(res) : "r"((u32)&data) : "t0"
+		: "+&r"(res) : "r"((u32)&data) : "$8"
 	);
 	printf("lw: %08x\n", res);
 }

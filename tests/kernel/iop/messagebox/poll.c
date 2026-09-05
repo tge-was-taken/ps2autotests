@@ -1,6 +1,7 @@
 #include <common-iop.h>
 #include <thmsgbx.h>
 #include "mbx-common.h"
+#include <sysclib.h>
 
 typedef struct {
 	s32 id;

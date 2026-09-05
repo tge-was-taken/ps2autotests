@@ -1,5 +1,7 @@
 #include <thpool.h>
 #include "vpl-common.h"
+#include <sysclib.h>
+#include <stdio.h>
 
 void printVpl(s32 vplId) {
 	iop_vpl_info_t vplInfo;

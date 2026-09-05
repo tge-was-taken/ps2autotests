@@ -1,5 +1,6 @@
 #include <common-iop.h>
 #include <string.h>
+#include <sysclib.h>
 
 //vsprintf is not reliable on a real PS2, we can't use it. We rely on this macro instead.
 #define EXECUTE_TEST(output, format, ...) sprintf(output, format, __VA_ARGS__); printf("%s: %s\n", format, output);

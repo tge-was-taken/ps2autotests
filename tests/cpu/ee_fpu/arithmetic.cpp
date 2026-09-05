@@ -21,12 +21,12 @@ static inline void SET_ACC_U32() {
 	static const float negz = -0.0f;
 
 	asm volatile (
-		"lui $t6, %0\n"
-		"ori $t6, $t6, %1\n"
-		"mtc1 $t6, $f4\n"
+		"lui $14, %0\n"
+		"ori $14, $14, %1\n"
+		"mtc1 $14, $f4\n"
 		// This sets ACC to $f4 + -0.  We use negative to avoid changing $f4 = -0 to ACC = +0.
 		"adda.s $f4, %2\n"
-		: : "K"((i >> 16) & 0xFFFF), "K"(i & 0xFFFF), "f"(negz) : "t6", "$f4"
+		: : "K"((i >> 16) & 0xFFFF), "K"(i & 0xFFFF), "f"(negz) : "$14", "$f4"
 	);
 }
 

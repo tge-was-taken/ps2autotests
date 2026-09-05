@@ -2,6 +2,7 @@
 #include <kerr.h>
 #include <thevent.h>
 #include <thbase.h>
+#include <sysclib.h>
 
 #define STACK_SIZE 0x800
 

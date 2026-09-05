@@ -1,8 +1,15 @@
 
 thbase_IMPORTS_start
 I_ReferThreadStatus
+I_CreateThread
+I_DeleteThread
+I_StartThread
+I_TerminateThread
 thbase_IMPORTS_end
 
 thevent_IMPORTS_start
 I_PollEventFlag
+I_CreateEventFlag
+I_DeleteEventFlag
+I_WaitEventFlag
 thevent_IMPORTS_end

@@ -51,11 +51,11 @@ static inline void SET_FC_I(int flag) {
 	register u32 bit = flag << 23;
 
 	asm volatile (
-		"cfc1 $t6, $31\n"
-		"and $t6, $t6, %0\n"
-		"or $t6, $t6, %1\n"
-		"ctc1 $t6, $31\n"
-		: : "r"(mask), "r"(bit) : "t6"
+		"cfc1 $14, $31\n"
+		"and $14, $14, %0\n"
+		"or $14, $14, %1\n"
+		"ctc1 $14, $31\n"
+		: : "r"(mask), "r"(bit) : "$14"
 	);
 }
 

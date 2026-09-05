@@ -6,21 +6,21 @@ static u32 __attribute__((aligned(16))) C_SHIFT_PATTERN2[4] = {0xAABBCCDD, 0x121
 template <int i>
 static void SET_SA_I() {
 	asm volatile (
-		"lui $t6, %0\n"
-		"ori $t6, $t6, %1\n"
-		"pcpyld $t6, $t6, $t6\n"
-		"mtsa $t6\n"
-		: : "K"((i >> 16) & 0xFFFF), "K"(i & 0xFFFF) : "t6"
+		"lui $14, %0\n"
+		"ori $14, $14, %1\n"
+		"pcpyld $14, $14, $14\n"
+		"mtsa $14\n"
+		: : "K"((i >> 16) & 0xFFFF), "K"(i & 0xFFFF) : "$14"
 	);
 }
 
 static void SET_SA_M(void *p) {
 	asm volatile (
-		"ld $t6, 0(%0)\n"
+		"ld $14, 0(%0)\n"
 		"sync\n"
 		"nop\n"
-		"mtsa $t6\n"
-		: : "r"(p) : "t6"
+		"mtsa $14\n"
+		: : "r"(p) : "$14"
 	);
 }
 
@@ -84,15 +84,15 @@ static void test_mtsa() {
 
 		"mtsa $0\n"
 
-		"lq $t6, 0(%1)\n"
+		"lq $14, 0(%1)\n"
 		"sync\n"
 		"nop\n"
 
-		"ori $t7, $0, 1\n"
+		"ori $15, $0, 1\n"
 
-		"mtsa $t7\n"
-		"qfsrv %0, $t6, $t6\n"
-		: "+r"(rd) : "r"(C_SHIFT_PATTERN1) : "t6", "t7"
+		"mtsa $15\n"
+		"qfsrv %0, $14, $14\n"
+		: "+r"(rd) : "r"(C_SHIFT_PATTERN1) : "$14", "$15"
 	);
 
 	printf("  mtsa immediately before qfsrv: ");
@@ -104,18 +104,18 @@ static void test_mtsa() {
 
 		"mtsa $0\n"
 
-		"lq $t6, 0(%1)\n"
+		"lq $14, 0(%1)\n"
 		"sync\n"
 		"nop\n"
 
-		"ori $t7, $0, 1\n"
+		"ori $15, $0, 1\n"
 
-		"mtsa $t7\n"
+		"mtsa $15\n"
 		"nop\n"
 		"nop\n"
 		"nop\n"
-		"qfsrv %0, $t6, $t6\n"
-		: "+r"(rd) : "r"(C_SHIFT_PATTERN1) : "t6", "t7"
+		"qfsrv %0, $14, $14\n"
+		: "+r"(rd) : "r"(C_SHIFT_PATTERN1) : "$14", "$15"
 	);
 
 	printf("  mtsa with nops before qfsrv: ");
@@ -138,7 +138,7 @@ static void test_mtsab() {
 
 		"mfsa %0\n"
 		"mtsab $0, 1\n"
-		: "+r"(rd) : : "t6"
+		: "+r"(rd) : : "$14"
 	);
 
 	printf("  mtsab next to mfsa: ");
@@ -159,7 +159,7 @@ static void test_mtsab() {
 		"nop\n"
 		"nop\n"
 		"mtsab $0, 1\n"
-		: "+r"(rd) : : "t6"
+		: "+r"(rd) : : "$14"
 	);
 
 	printf("  mtsab with space after mfsa: ");
@@ -187,17 +187,17 @@ static void test_mtsab() {
 	PRINT_SA(true);
 
 	asm volatile (
-		"ori $t6, $0, 4\n"
-		"mtsab $t6, 1\n"
-		: : : "t6"
+		"ori $14, $0, 4\n"
+		"mtsab $14, 1\n"
+		: : : "$14"
 	);
 	printf("  mtsab 4 ^ 1: ");
 	PRINT_SA(true);
 
 	asm volatile (
-		"ori $t6, $0, 5\n"
-		"mtsab $t6, 1\n"
-		: : : "t6"
+		"ori $14, $0, 5\n"
+		"mtsab $14, 1\n"
+		: : : "$14"
 	);
 	printf("  mtsab 5 ^ 1: ");
 	PRINT_SA(true);
@@ -219,7 +219,7 @@ static void test_mtsah() {
 
 		"mfsa %0\n"
 		"mtsah $0, 1\n"
-		: "+r"(rd) : : "t6"
+		: "+r"(rd) : : "$14"
 	);
 
 	printf("  mtsah next to mfsa: ");
@@ -240,7 +240,7 @@ static void test_mtsah() {
 		"nop\n"
 		"nop\n"
 		"mtsah $0, 1\n"
-		: "+r"(rd) : : "t6"
+		: "+r"(rd) : : "$14"
 	);
 
 	printf("  mtsah with space after mfsa: ");
@@ -268,17 +268,17 @@ static void test_mtsah() {
 	PRINT_SA(true);
 
 	asm volatile (
-		"ori $t6, $0, 4\n"
-		"mtsah $t6, 1\n"
-		: : : "t6"
+		"ori $14, $0, 4\n"
+		"mtsah $14, 1\n"
+		: : : "$14"
 	);
 	printf("  mtsah 4 ^ 1: ");
 	PRINT_SA(true);
 
 	asm volatile (
-		"ori $t6, $0, 5\n"
-		"mtsah $t6, 1\n"
-		: : : "t6"
+		"ori $14, $0, 5\n"
+		"mtsah $14, 1\n"
+		: : : "$14"
 	);
 	printf("  mtsah 5 ^ 1: ");
 	PRINT_SA(true);
@@ -293,16 +293,16 @@ static void do_qdsrv_i() {
 		".set noreorder\n"
 		".set nomacro\n"
 
-		"lq $t6, 0(%1)\n"
-		"lq $t7, 0(%2)\n"
+		"lq $14, 0(%1)\n"
+		"lq $15, 0(%2)\n"
 		"sync\n"
 
 		"mtsab $0, %3\n"
 		"nop\n"
 		"nop\n"
 		"nop\n"
-		"qfsrv %0, $t6, $t7\n"
-		: "+r"(rd) : "r"(C_SHIFT_PATTERN1), "r"(C_SHIFT_PATTERN2), "i"(i) : "t6", "t7"
+		"qfsrv %0, $14, $15\n"
+		: "+r"(rd) : "r"(C_SHIFT_PATTERN1), "r"(C_SHIFT_PATTERN2), "i"(i) : "$14", "$15"
 	);
 
 	printf("  qdsrv %d: ", i);

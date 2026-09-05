@@ -190,7 +190,7 @@ void __attribute__((noinline)) test_jalr_rs_rd_match() {
 
 		"move    $t2, $ra\n"
 		"la      $t0, target2_%=\n"
-		"jalr    $t0, $t0\n"
+		".word 0x01004009\n" // jalr $t0, $t0
 		"nop\n"
 
 		"target1_%=:\n"

@@ -23,12 +23,17 @@ enum RegPCCR
 	PCCR_CTE = 1 << 31
 };
 
+// gas only assembles specifiers 0 and 1, and the point of this test is what
+// the others do, so the words are built by hand around a fixed $2.
+#define PERF_WORD(mt, isCounter) "0x40" #mt "2c80" #isCounter " + (%1 << 1)"
+
 template <int index>
 static u32 getEventSpecifier() {
 	u32 value = 0;
 	asm volatile (
-		"mfps    %0, %1\n"
-		: "+r"(value) : "i"(index)
+		".word " PERF_WORD(0, 0) "\n"
+		"move    %0, $2\n"
+		: "=r"(value) : "i"(index) : "$2"
 	);
 	return value;
 }
@@ -36,9 +41,10 @@ static u32 getEventSpecifier() {
 template <int index>
 static void setEventSpecifier(u32 value) {
 	asm volatile (
-		"mtps    %0, %1\n"
+		"move    $2, %0\n"
+		".word " PERF_WORD(8, 0) "\n"
 		"sync.p\n"
-		: "+r"(value) : "i"(index)
+		: : "r"(value), "i"(index) : "$2"
 	);
 }
 
@@ -46,8 +52,9 @@ template <int index>
 static u32 getCounter() {
 	u32 value = 0;
 	asm volatile (
-		"mfpc    %0, %1\n"
-		: "+r"(value) : "i"(index)
+		".word " PERF_WORD(0, 1) "\n"
+		"move    %0, $2\n"
+		: "=r"(value) : "i"(index) : "$2"
 	);
 	return value;
 }
@@ -55,9 +62,10 @@ static u32 getCounter() {
 template <int index>
 static void setCounter(u32 value) {
 	asm volatile (
-		"mtpc    %0, %1\n"
+		"move    $2, %0\n"
+		".word " PERF_WORD(8, 1) "\n"
 		"sync.p\n"
-		: "+r"(value) : "i"(index)
+		: : "r"(value), "i"(index) : "$2"
 	);
 }
 

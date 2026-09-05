@@ -36,82 +36,84 @@ inline void STOREF_##OP(const register u128 &val, void *address) { \
 #define SET_U128(f, t) \
 	f = (t); \
 	asm volatile ( \
-		"dsll32 $t6, %0, 0\n" \
-		"or $t6, $t6, %0\n" \
-		"pcpyld %0, $t6, $t6\n" \
-		: "+&r"(f) : : "t6" \
+		"dsll32 $14, %0, 0\n" \
+		"or $14, $14, %0\n" \
+		"pcpyld %0, $14, $14\n" \
+		: "+&r"(f) : : "$14" \
 	);
 
-#define TEST_CTC2(reg) \
+// gas no longer takes the viNN spelling, so the number and the label the test
+// prints are passed separately.
+#define TEST_CTC2(number, name) \
 	do { \
 		register u32 x__printvi; \
 		asm volatile ( \
-			"addiu $t0, $0, -1\n" \
+			"addiu $8, $0, -1\n" \
 			"vnop\n" \
-			"ctc2 $t0, " #reg "\n" \
+			"ctc2 $8, $" #number "\n" \
 			"vnop\n" \
-			"cfc2 %0, " #reg "\n" \
+			"cfc2 %0, $" #number "\n" \
 			"sync\n" \
-			: "=r"(x__printvi) : : "t0" \
+			: "=r"(x__printvi) : : "$8" \
 		); \
-		printf("ctc2 -> " #reg ": %08x\n", x__printvi); \
+		printf("ctc2 -> " name ": %08x\n", x__printvi); \
 	} while (false)
 
 void test_cfc2() {
-	register u128 vi21 = 0;
+	register u128 $vi21 = 0;
 	
-	//Prepare tests (move ~0 in vi21)
+	//Prepare tests (move ~0 in $vi21)
 	asm volatile (
-		"addiu $t0, $0, -1\n"
+		"addiu $8, $0, -1\n"
 		"vnop\n"
-		"ctc2 $t0, vi21\n"
-		: : : "t0"
+		"ctc2 $8, $21\n"
+		: : : "$8"
 	);
 	
-	SET_U128(vi21, 0x12345678);
+	SET_U128($vi21, 0x12345678);
 	asm volatile (
 		"vnop\n"
-		"cfc2 %0, vi21\n"
+		"cfc2 %0, $21\n"
 		"sync\n"
-		: "+&r"(vi21)
+		: "+&r"($vi21)
 	);
 
 	printf("cfc2: ");
-	PRINT_R(vi21, true);
+	PRINT_R($vi21, true);
 	
 	asm volatile (
 		"vnop\n"
-		"cfc2 $0, vi21\n"
+		"cfc2 $0, $21\n"
 		"sync\n"
 		"por %0, $0, $0\n"
-		: "+&r"(vi21)
+		: "+&r"($vi21)
 	);
 	
 	printf("cfc2 -> $0: ");
-	PRINT_R(vi21, true);
+	PRINT_R($vi21, true);
 }
 
 void test_ctc2() {
-	TEST_CTC2(vi00);
-	TEST_CTC2(vi01);
-	//Assuming the same for vi02 -> vi15
+	TEST_CTC2(0, "$vi0");
+	TEST_CTC2(1, "$vi1");
+	//Assuming the same for $vi2 -> $vi15
 	
-	TEST_CTC2(vi16);    //Status flag
-	TEST_CTC2(vi17);    //MAC flag
-	TEST_CTC2(vi18);    //Clipping flag
-	TEST_CTC2(vi19);    //Reserved
-	TEST_CTC2(vi20);    //R
-	TEST_CTC2(vi21);    //I
-	TEST_CTC2(vi22);    //Q
-	TEST_CTC2(vi23);    //Reserved
-	TEST_CTC2(vi24);    //Reserved
-	TEST_CTC2(vi25);    //Reserved 
-	//TEST_CTC2(vi26);    //TPC - Not printed because it always changes
-	TEST_CTC2(vi27);    //CMSAR0
-	TEST_CTC2(vi28);    //FBRST
-	TEST_CTC2(vi29);    //VPU-STAT
-	//TEST_CTC2(vi30);    //Reserved - Not printed because it always changes
-	TEST_CTC2(vi31);    //CMSAR1
+	TEST_CTC2(16, "$vi16");    //Status flag
+	TEST_CTC2(17, "$vi17");    //MAC flag
+	TEST_CTC2(18, "$vi18");    //Clipping flag
+	TEST_CTC2(19, "$vi19");    //Reserved
+	TEST_CTC2(20, "$vi20");    //R
+	TEST_CTC2(21, "$vi21");    //I
+	TEST_CTC2(22, "$vi22");    //Q
+	TEST_CTC2(23, "$vi23");    //Reserved
+	TEST_CTC2(24, "$vi24");    //Reserved
+	TEST_CTC2(25, "$vi25");    //Reserved 
+	//TEST_CTC2(26, "$vi26");    //TPC - Not printed because it always changes
+	TEST_CTC2(27, "$vi27");    //CMSAR0
+	TEST_CTC2(28, "$vi28");    //FBRST
+	TEST_CTC2(29, "$vi29");    //VPU-STAT
+	//TEST_CTC2(30, "$vi30");    //Reserved - Not printed because it always changes
+	TEST_CTC2(31, "$vi31");    //CMSAR1
 }
 
 void test_cfc2_tpc() {
@@ -126,8 +128,8 @@ void test_cfc2_tpc() {
 	asm volatile (
 		"vcallms 0\n"
 		"vnop\n"
-		"cfc2.i $0, vi01\n"
-		"cfc2 %0, vi26\n"
+		"cfc2.i $0, $1\n"
+		"cfc2 %0, $26\n"
 		"sync\n"
 		: "+&r"(tpc)
 	);
@@ -141,7 +143,7 @@ void test_qmfc2() {
 	SET_U128(vf, 0x12345678);
 	asm volatile (
 		"vnop\n"
-		"qmfc2 %0, vf0\n"
+		"qmfc2 %0, $vf0\n"
 		"sync\n"
 		: "+&r"(vf)
 	);
@@ -151,7 +153,7 @@ void test_qmfc2() {
 	
 	asm volatile (
 		"vnop\n"
-		"qmfc2 $0, vf0\n"
+		"qmfc2 $0, $vf0\n"
 		"sync\n"
 		"por %0, $0, $0\n"
 		: "+&r"(vf)

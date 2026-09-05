@@ -1,6 +1,10 @@
 
 thbase_IMPORTS_start
 I_ReferThreadStatus
+I_CreateThread
+I_DeleteThread
+I_StartThread
+I_TerminateThread
 thbase_IMPORTS_end
 
 thmsgbx_IMPORTS_start

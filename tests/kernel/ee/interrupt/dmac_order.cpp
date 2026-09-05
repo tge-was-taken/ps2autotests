@@ -24,10 +24,12 @@ void appendResult(u32 result) {
 	}
 }
 
-template <s32 number, s32 returnValue>
-s32 dmacHandler(s32 channel) {
+// The return values under test have the top bit set, so the parameter is
+// unsigned and the bit pattern is cast back on the way out.
+template <int number, unsigned int returnValue>
+int dmacHandler(int channel) {
 	appendResult(number);
-	return returnValue;
+	return (int)returnValue;
 }
 
 void initializeTest() {
@@ -143,7 +145,7 @@ void cancelTest() {
 	printf("cancel: ");
 	initializeTest();
 	addTestDmacHandler(&dmacHandler<1, 0>,  -1);
-	addTestDmacHandler(&dmacHandler<2, -1>, -1);
+	addTestDmacHandler(&dmacHandler<2, 0xFFFFFFFF>, -1);
 	addTestDmacHandler(&dmacHandler<3, 0>,  -1);
 	waitForTestResults();
 	finishTest();

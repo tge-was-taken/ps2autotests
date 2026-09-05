@@ -43,7 +43,7 @@ void doTest(VIF::Unit* unit, const char* testName, WriteIntCodeFunction writeInt
 	DMA::SendSimple(unit->dmaChannel, vifcode.Raw(), vifPacketSize);
 	
 	printf("%s:\n", testName);
-	printf("  Status after transfer - MASK: %08x, STAT: %08x\n", unit->regs->mask, unit->regs->stat);
+	printf("  Status after transfer - MASK: %08x, STAT: %08x\n", unit->regs->mask, unit->regs->stat.bits_);
 }
 
 int main(int argc, char *argv[]) {

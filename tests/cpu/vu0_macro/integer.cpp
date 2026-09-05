@@ -44,10 +44,10 @@ static void setup_vi_constants() {
 
 #define SET_VI(reg, i) \
 	asm volatile ( \
-		"lui $t0, %0\n" \
-		"ori $t0, $t0, %1\n" \
-		"ctc2 $t0, " #reg "\n" \
-		: : "K"(((i) >> 16) & 0xFFFF), "K"((i) & 0xFFFF) : "t0" \
+		"lui $8, %0\n" \
+		"ori $8, $8, %1\n" \
+		"ctc2 $8, " #reg "\n" \
+		: : "K"(((i) >> 16) & 0xFFFF), "K"((i) & 0xFFFF) : "$8" \
 	)
 #define SET_VI_M(reg, m, lane) \
 	SET_VI(reg, (u16)(((u8 *)m - (u8 *)vu_mem0) / 16)); \
@@ -76,8 +76,8 @@ static void setup_vi_constants() {
 
 #define VZDD(OP, id, is, it) \
 	asm volatile ( \
-		#OP " vi00, " #is ", " #it "\n" \
-		"vior " #id ", vi00, vi00\n" \
+		#OP " $vi0, " #is ", " #it "\n" \
+		"vior " #id ", $vi0, $vi0\n" \
 	)
 
 #define VDDI(OP, id, is, t) \
@@ -87,31 +87,31 @@ static void setup_vi_constants() {
 
 #define VZDI(OP, id, is, it) \
 	asm volatile ( \
-		#OP " vi00, " #is ", " #it "\n" \
-		"vior " #id ", vi00, vi00\n" \
+		#OP " $vi0, " #is ", " #it "\n" \
+		"vior " #id ", $vi0, $vi0\n" \
 	)
 
 #define VDDD_OP_DO_III(OP, d, s, t) \
 	do { \
 		Vu0Flags flags; \
-		SET_VI(vi01, d); \
-		SET_VI(vi02, s); \
-		SET_VI(vi03, t); \
-		VDDD(OP, vi01, vi02, vi03); \
+		SET_VI($vi1, d); \
+		SET_VI($vi2, s); \
+		SET_VI($vi3, t); \
+		VDDD(OP, $vi1, $vi2, $vi3); \
 		printf("  %s %d, %d: ", #OP, s, t); \
-		PRINT_VI(vi01, false); \
+		PRINT_VI($vi1, false); \
 		flags.PrintChanges(true); \
 	} while (false) \
 
 #define VDDD_OP_DO_MMM(OP, d, s, t) \
 	do { \
 		Vu0Flags flags; \
-		SET_VI_M(vi01, d, x); \
-		SET_VI_M(vi02, s, x); \
-		SET_VI_M(vi03, t, x); \
-		VDDD(OP, vi01, vi02, vi03); \
+		SET_VI_M($vi1, d, x); \
+		SET_VI_M($vi2, s, x); \
+		SET_VI_M($vi3, t, x); \
+		VDDD(OP, $vi1, $vi2, $vi3); \
 		printf("  %s %s, %s: ", #OP, #s, #t); \
-		PRINT_VI(vi01, false); \
+		PRINT_VI($vi1, false); \
 		flags.PrintChanges(true); \
 	} while (false) \
 
@@ -142,12 +142,12 @@ static void test_##OP() { \
 	VDDD_OP_DO_MMM(OP, CVI_GARBAGE1, CVI_S64_MIN, CVI_S64_MIN); \
 	VDDD_OP_DO_MMM(OP, CVI_GARBAGE1, CVI_GARBAGE1, CVI_GARBAGE2); \
 	\
-	SET_VI(vi01, 0x1337); \
-	SET_VI(vi02, 0xDEAD); \
-	SET_VI(vi03, 0x7331); \
-	VZDI(OP, vi01, vi02, vi03); \
+	SET_VI($vi1, 0x1337); \
+	SET_VI($vi2, 0xDEAD); \
+	SET_VI($vi3, 0x7331); \
+	VZDI(OP, $vi1, $vi2, $vi3); \
 	printf("  %s -> $0: ", #OP); \
-	PRINT_VI(vi01, true); \
+	PRINT_VI($vi1, true); \
 	\
 	printf("\n"); \
 }
@@ -155,22 +155,22 @@ static void test_##OP() { \
 #define VDDI_OP_DO_III(OP, d, s, t) \
 	do { \
 		Vu0Flags flags; \
-		SET_VI(vi01, d); \
-		SET_VI(vi02, s); \
-		VDDD(OP, vi01, vi02, t); \
+		SET_VI($vi1, d); \
+		SET_VI($vi2, s); \
+		VDDD(OP, $vi1, $vi2, t); \
 		printf("  %s %d, %d: ", #OP, s, t); \
-		PRINT_VI(vi01, false); \
+		PRINT_VI($vi1, false); \
 		flags.PrintChanges(true); \
 	} while (false)
 
 #define VDDI_OP_DO_MMI(OP, d, s, t) \
 	do { \
 		Vu0Flags flags; \
-		SET_VI_M(vi01, d, x); \
-		SET_VI_M(vi02, s, x); \
-		VDDD(OP, vi01, vi02, t); \
+		SET_VI_M($vi1, d, x); \
+		SET_VI_M($vi2, s, x); \
+		VDDD(OP, $vi1, $vi2, t); \
 		printf("  %s %s, %s: ", #OP, #s, #t); \
-		PRINT_VI(vi01, false); \
+		PRINT_VI($vi1, false); \
 		flags.PrintChanges(true); \
 	} while (false)
 
@@ -196,11 +196,11 @@ static void test_viaddi() {
 	VDDI_OP_DO_MMI(viaddi, CVI_GARBAGE1, CVI_S64_MIN, -15);
 	VDDI_OP_DO_MMI(viaddi, CVI_GARBAGE1, CVI_GARBAGE1, 3);
 
-	SET_VI_M(vi01, CVI_GARBAGE1, y);
-	SET_VI_M(vi02, CVI_GARBAGE1, z);
-	VZDI(viaddi, vi01, vi02, 4);
+	SET_VI_M($vi1, CVI_GARBAGE1, y);
+	SET_VI_M($vi2, CVI_GARBAGE1, z);
+	VZDI(viaddi, $vi1, $vi2, 4);
 	printf("  viaddi -> $0: ");
-	PRINT_VI(vi01, true);
+	PRINT_VI($vi1, true);
 
 	printf("\n");
 }

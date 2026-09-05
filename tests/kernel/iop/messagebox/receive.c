@@ -2,6 +2,7 @@
 #include <thbase.h>
 #include <thmsgbx.h>
 #include "mbx-common.h"
+#include <sysclib.h>
 
 #define STACK_SIZE 0x800
 

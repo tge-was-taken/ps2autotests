@@ -15,12 +15,12 @@ u32 getCpCond() {
 		".set noreorder\n"
 		"sync.l\n"
 		"sync.p\n"
-		"bc0t done\n"
+		"bc0t done_%=\n"
 		"addiu %0, $0, 1\n"
-		"b done\n"
+		"b done_%=\n"
 		"addiu %0, $0, 0\n"
-		"done:\n"
-		: : "r"(result)
+		"done_%=:\n"
+		: "=r"(result)
 	);
 	return result;
 }

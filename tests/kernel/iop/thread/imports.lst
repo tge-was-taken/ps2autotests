@@ -2,9 +2,23 @@
 thbase_IMPORTS_start
 I_CancelWakeupThread
 I_ReferThreadStatus
+I_CreateThread
+I_DelayThread
+I_DeleteThread
+I_StartThread
+I_TerminateThread
+I_WakeupThread
+I_GetThreadId
+I_SleepThread
+I_ReleaseWaitThread
 thbase_IMPORTS_end
 
 thmsgbx_IMPORTS_start
 I_CreateMbx
 I_ReceiveMbx
 thmsgbx_IMPORTS_end
+
+thevent_IMPORTS_start
+I_CreateEventFlag
+I_WaitEventFlag
+thevent_IMPORTS_end

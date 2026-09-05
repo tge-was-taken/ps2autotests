@@ -17,7 +17,7 @@ static inline void RRHL_##OP(const register u128 &rs, const register u128 &rt) {
 	asm volatile ( \
 		".set noreorder\n" \
 		".set nomacro\n" \
-		#OP " %0, %1\n" \
+		#OP " $0, %0, %1\n" \
 		: : "r"(rs), "r"(rt) \
 	); \
 }
@@ -100,7 +100,7 @@ static inline void SET_HILO(const HILOREGS &regs) {
 }
 
 static inline void PRINT_HILO(const HILOREGS &regs, bool newline) {
-	printf("H: %016lx %016lx L: %016lx %016lx", regs.hi, regs.hi1, regs.lo, regs.lo1);
+	printf("H: %016llx %016llx L: %016llx %016llx", regs.hi, regs.hi1, regs.lo, regs.lo1);
 	if (newline) {
 		printf("\n");
 	}

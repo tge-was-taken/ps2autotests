@@ -2,6 +2,7 @@
 #include <thbase.h>
 #include <thmsgbx.h>
 #include "mbx-common.h"
+#include <sysclib.h>
 
 #define STACK_SIZE 0x800
 
@@ -46,14 +47,14 @@ void testLinkUpdate() {
 	
 	memset(&msg1, 0, sizeof(MSG));
 	memset(&msg2, 0, sizeof(MSG));
-	msg1.header.next = (struct iop_message*)&msg2;
+	msg1.header.next = (struct _iop_message*)&msg2;
 	
 	SendMbx(mbxId, &msg1);
 	
 	printf("  after sending, msg1's next pointer refers to: ");
-	if (msg1.header.next == (struct iop_message*)&msg1) {
+	if (msg1.header.next == (struct _iop_message*)&msg1) {
 		printf("msg1\n");
-	} else if (msg1.header.next == (struct iop_message*)&msg2) {
+	} else if (msg1.header.next == (struct _iop_message*)&msg2) {
 		printf("msg2\n");
 	} else {
 		printf("unknown (%p)\n", msg1.header.next);

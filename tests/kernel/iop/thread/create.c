@@ -1,5 +1,6 @@
 #include <common-iop.h>
 #include <thbase.h>
+#include <sysclib.h>
 
 void nullThreadProc(u32 param) {
 	//Do nothing

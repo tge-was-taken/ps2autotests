@@ -23,7 +23,7 @@ namespace VIF {
 		CMD_STMASK = 0x20 << 24,
 		CMD_STROW = 0x30 << 24,
 		CMD_STCOL = 0x31 << 24,
-		CMD_MPG = 0x46 << 24,
+		CMD_MPG = 0x4A << 24,
 		CMD_DIRECT = 0x50 << 24,
 		CMD_DIRECTHL = 0x51 << 24,
 	};

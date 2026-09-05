@@ -8,11 +8,11 @@ void __attribute__((noinline)) test_beq() {
 	asm volatile (
 		".set    noreorder\n"
 
-		"li      $t0, 0\n"
-		"beq     $t0, $t0, target1_%=\n"
-		"beq     $t0, $t0, target2_%=\n"
-		"beq     $t0, $t0, target3_%=\n"
-		"beq     $t0, $t0, target4_%=\n"
+		"li      $8, 0\n"
+		"beq     $8, $8, target1_%=\n"
+		"beq     $8, $8, target2_%=\n"
+		"beq     $8, $8, target3_%=\n"
+		"beq     $8, $8, target4_%=\n"
 		"nop\n"
 
 		"target1_%=:\n"
@@ -49,8 +49,8 @@ void __attribute__((noinline)) test_jal() {
 	asm volatile (
 		".set    noreorder\n"
 
-		"move    $t2, $ra\n"
-		"li      $t0, 0\n"
+		"move    $10, $ra\n"
+		"li      $8, 0\n"
 		"jal     target2_%=\n"
 		"li      $ra, 2\n"
 
@@ -63,9 +63,9 @@ void __attribute__((noinline)) test_jal() {
 		"move    %0, $ra\n"
 
 		"skip_%=:\n"
-		"move    $ra, $t2\n"
+		"move    $ra, $10\n"
 
-		: "+r"(result)
+		: "+r"(result) : : "$9", "$10"
 	);
 
 	printf("jal: ra order: %08x\n", result);
@@ -77,10 +77,10 @@ void __attribute__((noinline)) test_jalr_clobber() {
 	asm volatile (
 		".set noreorder\n"
 
-		"move    $t2, $ra\n"
-		"la      $t0, target2_%=\n"
-		"jalr    $t0\n"
-		"ori     $t0, $0, 5\n"
+		"move    $10, $ra\n"
+		"la      $8, target2_%=\n"
+		"jalr    $8\n"
+		"ori     $8, $0, 5\n"
 		"nop\n"
 
 		"target1_%=:\n"
@@ -92,10 +92,10 @@ void __attribute__((noinline)) test_jalr_clobber() {
 		"li      %0, 2\n"
 
 		"skip_%=:\n"
-		"move    $ra, $t2\n"
+		"move    $ra, $10\n"
 
 		".set    reorder\n"
-		: "+r"(result) : : "t0", "t2"
+		: "+r"(result) : : "$8", "$10"
 	);
 
 	printf("jalr: clobber rs: %08x\n", result);
@@ -107,9 +107,9 @@ void __attribute__((noinline)) test_jalr() {
 	asm volatile (
 		".set noreorder\n"
 
-		"move    $t2, $ra\n"
-		"la      $t0, target2_%=\n"
-		"jalr    $t0\n"
+		"move    $10, $ra\n"
+		"la      $8, target2_%=\n"
+		"jalr    $8\n"
 		"li      $ra, 2\n"
 
 		"target1_%=:\n"
@@ -121,9 +121,9 @@ void __attribute__((noinline)) test_jalr() {
 		"move    %0, $ra\n"
 
 		"skip_%=:\n"
-		"move    $ra, $t2\n"
+		"move    $ra, $10\n"
 
-		: "+r"(result)
+		: "+r"(result) : : "$9", "$10"
 	);
 
 	printf("jalr: ra order: %08x\n", result);
@@ -133,9 +133,9 @@ void __attribute__((noinline)) test_jalr() {
 	asm volatile (
 		".set noreorder\n"
 
-		"move    $t2, $ra\n"
-		"la      $t1, target2_%=\n"
-		"jalr    %0, $t1\n"
+		"move    $10, $ra\n"
+		"la      $9, target2_%=\n"
+		"jalr    %0, $9\n"
 		"nop\n"
 
 		"target1_%=:\n"
@@ -146,9 +146,9 @@ void __attribute__((noinline)) test_jalr() {
 		"nop\n"
 
 		"skip_%=:\n"
-		"move    $ra, $t2\n"
+		"move    $ra, $10\n"
 
-		: "+r"(result)
+		: "+r"(result) : : "$9", "$10"
 	);
 
 	printf("jalr: non-ra: %08x\n", result);
@@ -158,9 +158,9 @@ void __attribute__((noinline)) test_jalr() {
 	asm volatile (
 		".set noreorder\n"
 
-		"move    $t2, $ra\n"
-		"la      $t1, target2_%=\n"
-		"jalr    %0, $t1\n"
+		"move    $10, $ra\n"
+		"la      $9, target2_%=\n"
+		"jalr    %0, $9\n"
 		"li      %0, 1\n"
 
 		"target1_%=:\n"
@@ -171,9 +171,9 @@ void __attribute__((noinline)) test_jalr() {
 		"nop\n"
 
 		"skip_%=:\n"
-		"move    $ra, $t2\n"
+		"move    $ra, $10\n"
 
-		: "+r"(result)
+		: "+r"(result) : : "$9", "$10"
 	);
 
 	printf("jalr: non-ra order: %08x\n", result);
@@ -183,9 +183,9 @@ void __attribute__((noinline)) test_jalr() {
 	asm volatile (
 		".set noreorder\n"
 
-		"move    $t2, $ra\n"
-		"la      $t0, target2_%=\n"
-		"jalr    $t0, $t0\n"
+		"move    $10, $ra\n"
+		"la      $8, target2_%=\n"
+		".word 0x01004009\n" // jalr $8, $8
 		"nop\n"
 
 		"target1_%=:\n"
@@ -197,9 +197,9 @@ void __attribute__((noinline)) test_jalr() {
 		"li      %0, 2\n"
 
 		"skip_%=:\n"
-		"move    $ra, $t2\n"
+		"move    $ra, $10\n"
 
-		: "+r"(result)
+		: "+r"(result) : : "$9", "$10"
 	);
 
 	printf("jalr: rs/rd match: %08x\n", result);
@@ -213,9 +213,9 @@ void __attribute__((noinline)) test_bltzal() {
 	asm volatile (
 		".set    noreorder\n"
 
-		"move    $t2, $ra\n"
-		"subu    $t0, $0, 1\n"
-		"bltzal  $t0, target2_%=\n"
+		"move    $10, $ra\n"
+		"subu    $8, $0, 1\n"
+		"bltzal  $8, target2_%=\n"
 		"li      $ra, 2\n"
 
 		"target1_%=:\n"
@@ -227,9 +227,9 @@ void __attribute__((noinline)) test_bltzal() {
 		"move    %0, $ra\n"
 
 		"skip_%=:\n"
-		"move    $ra, $t2\n"
+		"move    $ra, $10\n"
 
-		: "+r"(result)
+		: "+r"(result) : : "$9", "$10"
 	);
 
 	printf("bltzal: ra order: %08x\n", result);
@@ -239,9 +239,9 @@ void __attribute__((noinline)) test_bltzal() {
 	asm volatile (
 		".set    noreorder\n"
 
-		"move    $t2, $ra\n"
-		"subu    $t0, $0, 1\n"
-		"bltzall $t0, target2_%=\n"
+		"move    $10, $ra\n"
+		"subu    $8, $0, 1\n"
+		"bltzall $8, target2_%=\n"
 		"li      $ra, 2\n"
 
 		"target1_%=:\n"
@@ -253,9 +253,9 @@ void __attribute__((noinline)) test_bltzal() {
 		"move    %0, $ra\n"
 
 		"skip_%=:\n"
-		"move    $ra, $t2\n"
+		"move    $ra, $10\n"
 
-		: "+r"(result)
+		: "+r"(result) : : "$9", "$10"
 	);
 
 	printf("bltzall: ra order: %08x\n", result);
@@ -267,9 +267,9 @@ void __attribute__((noinline)) test_bgezal() {
 	asm volatile (
 		".set    noreorder\n"
 
-		"move    $t2, $ra\n"
-		"li      $t0, 0\n"
-		"bgezal  $t0, target2_%=\n"
+		"move    $10, $ra\n"
+		"li      $8, 0\n"
+		"bgezal  $8, target2_%=\n"
 		"li      $ra, 2\n"
 
 		"target1_%=:\n"
@@ -281,9 +281,9 @@ void __attribute__((noinline)) test_bgezal() {
 		"move    %0, $ra\n"
 
 		"skip_%=:\n"
-		"move    $ra, $t2\n"
+		"move    $ra, $10\n"
 
-		: "+r"(result)
+		: "+r"(result) : : "$9", "$10"
 	);
 
 	printf("bgezal: ra order: %08x\n", result);
@@ -293,9 +293,9 @@ void __attribute__((noinline)) test_bgezal() {
 	asm volatile (
 		".set    noreorder\n"
 
-		"move    $t2, $ra\n"
-		"li      $t0, 0\n"
-		"bgezall $t0, target2_%=\n"
+		"move    $10, $ra\n"
+		"li      $8, 0\n"
+		"bgezall $8, target2_%=\n"
 		"li      $ra, 2\n"
 
 		"target1_%=:\n"
@@ -307,9 +307,9 @@ void __attribute__((noinline)) test_bgezal() {
 		"move    %0, $ra\n"
 
 		"skip_%=:\n"
-		"move    $ra, $t2\n"
+		"move    $ra, $10\n"
 
-		: "+r"(result)
+		: "+r"(result) : : "$9", "$10"
 	);
 
 	printf("bgezall: ra order: %08x\n", result);

@@ -20,7 +20,7 @@ void testSetBits() {
 	
 	DMA::SendSimple(DMA::D2, packet.Raw(), packet.Size());
 
-	printf("Set signal bits -> CSR[SIGNAL] = %016lx, SIGLBLID: %016lx\n", 
+	printf("Set signal bits -> CSR[SIGNAL] = %016llx, SIGLBLID: %016llx\n", 
 		*GS::CSR & GS::CSR_SIGNAL, *GS::SIGLBLID);
 }
 
@@ -40,7 +40,7 @@ void testClearBits() {
 	
 	DMA::SendSimple(DMA::D2, packet.Raw(), packet.Size());
 
-	printf("Clear signal bits -> CSR[SIGNAL] = %016lx, SIGLBLID: %016lx\n", 
+	printf("Clear signal bits -> CSR[SIGNAL] = %016llx, SIGLBLID: %016llx\n", 
 		*GS::CSR & GS::CSR_SIGNAL, *GS::SIGLBLID);
 }
 
