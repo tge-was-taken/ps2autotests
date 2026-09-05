@@ -1,4 +1,4 @@
-TARGETS = performance
+TARGETS = performance registers
 EE_LIBS =
 
 COMMON_DIR=../../../common

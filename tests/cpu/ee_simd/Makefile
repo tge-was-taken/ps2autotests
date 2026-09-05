@@ -1,4 +1,4 @@
-TARGETS = arithmetic compare funnel logic muldiv shuffle
+TARGETS = arithmetic compare funnel hazards logic muldiv shuffle
 EE_LIBS =
 
 COMMON_DIR=../../../common

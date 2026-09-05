@@ -1,4 +1,4 @@
-TARGETS = arithmetic branch branchdelay compare convert fcr muldiv sqrt transfer
+TARGETS = accumulate arithmetic branch branchdelay compare convert edge fcr fmac muldiv sqrt transfer
 EE_LIBS =
 
 COMMON_DIR=../../../common
