@@ -481,7 +481,9 @@ LowerOp B(s16 imm11) {
 }
 
 LowerOp BAL(Reg t, s16 imm11) {
-	return LowerType7(OP_BAL, DEST_NONE, VF00, t, SIMM11(imm11));
+	// The link register is an integer one, so it needs the same conversion
+	// JALR makes rather than going in as a float register number.
+	return LowerType7(OP_BAL, DEST_NONE, VF00, VI(t), SIMM11(imm11));
 }
 
 LowerOp DIV(Field fsf, Reg s, Field ftf, Reg t) {
