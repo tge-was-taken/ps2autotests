@@ -263,6 +263,38 @@ void TestRunner::PrintRegisterField(VU::Reg r, VU::Field field, bool newline) {
 	}
 }
 
+void TestRunner::PrintRegisterHex(VU::Reg r, bool newline) {
+	using namespace VU;
+
+	if (r >= VI00 && r <= VI15) {
+		PrintIntegerRegister(r - VI00);
+	} else {
+		const u8 *regs = vu_ == 0 ? vu0_reg_mem : vu1_reg_mem;
+		const FloatBits *p = (const FloatBits *)(regs + 16 * (16 + r));
+		printf("%08x %08x %08x %08x", p[0].u, p[1].u, p[2].u, p[3].u);
+	}
+	if (newline) {
+		printf("\n");
+	}
+}
+
+u32 TestRunner::ReadRegisterField(VU::Reg r, VU::Field field) {
+	using namespace VU;
+
+	assert(r <= VF31);
+
+	const u8 *regs = vu_ == 0 ? vu0_reg_mem : vu1_reg_mem;
+	const FloatBits *p = (const FloatBits *)(regs + 16 * (16 + r));
+	return p[field].u;
+}
+
+void TestRunner::PrintRegisterFieldHex(VU::Reg r, VU::Field field, bool newline) {
+	printf("%08x", ReadRegisterField(r, field));
+	if (newline) {
+		printf("\n");
+	}
+}
+
 void TestRunner::PrintVectorRegister(int i) {
 	const u8 *regs = vu_ == 0 ? vu0_reg_mem : vu1_reg_mem;
 	// Skip the 16 integer registers, and jump to the vector.

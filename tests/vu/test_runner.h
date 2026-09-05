@@ -35,6 +35,14 @@ public:
 	// Print out any integer or float/vector register.
 	void PrintRegister(VU::Reg r, bool newline);
 	void PrintRegisterField(VU::Reg r, VU::Field field, bool newline);
+
+	// The same without the decimal rendering, for values a decimal makes no
+	// clearer and forty digits wider.
+	void PrintRegisterHex(VU::Reg r, bool newline);
+	void PrintRegisterFieldHex(VU::Reg r, VU::Field field, bool newline);
+
+	// One saved lane, for a test that compares rather than prints.
+	u32 ReadRegisterField(VU::Reg r, VU::Field field);
 	
 	// Print out a summary of status register changes.
 	void PrintStatus(bool newline);
