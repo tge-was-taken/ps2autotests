@@ -88,12 +88,14 @@ static void testControlBits() {
 	static const u32 values[] = {0x00000000, 0xFFFFFFFE, 0x000000FE, 0xFFFF0000};
 
 	printf("CHCR readback, start bit left alone:\n");
+	// Bit eight is the start bit, and a value that sets it runs a transfer with
+	// whatever address and count the channel happens to be holding.
 	for (int c = 0; c < channelCount; ++c) {
 		volatile DMA::Channel *channel = channels[c].channel;
 
 		printf("  %-8s:", channels[c].name);
 		for (unsigned v = 0; v < sizeof(values) / sizeof(values[0]); ++v) {
-			channel->chcr = (DMA::ChannelRegCHCRBits)values[v];
+			channel->chcr = (DMA::ChannelRegCHCRBits)(values[v] & ~DMA::CHCR_STR);
 			printf(" %08x", channel->chcr.bits_);
 		}
 		printf("\n");
@@ -178,9 +180,10 @@ static void testPriority() {
 	const u32 saved = DMA::D_PCR->bits_;
 	for (unsigned v = 0; v < sizeof(values) / sizeof(values[0]); ++v) {
 		*DMA::D_PCR = (DMA::RegPCRBits)values[v];
-		printf("  wrote %08x, read %08x\n", values[v], DMA::D_PCR->bits_);
+		const u32 back = DMA::D_PCR->bits_;
+		*DMA::D_PCR = (DMA::RegPCRBits)saved;
+		printf("  wrote %08x, read %08x\n", values[v], back);
 	}
-	*DMA::D_PCR = (DMA::RegPCRBits)saved;
 }
 
 // The main control register, whose cycle stealing and stall fields decide how
@@ -188,13 +191,16 @@ static void testPriority() {
 static void testControl() {
 	static const u32 values[] = {0x00000000, 0xFFFFFFFF, 0x00000001, 0x0000FFFF};
 
+	// The stall and ring fields reroute whatever is running, so the value is put
+	// back before anything else uses a channel, printing included.
 	printf("D_CTRL readback:\n");
 	const u32 saved = DMA::D_CTRL->bits_;
 	for (unsigned v = 0; v < sizeof(values) / sizeof(values[0]); ++v) {
 		*DMA::D_CTRL = (DMA::RegCTRLBits)values[v];
-		printf("  wrote %08x, read %08x\n", values[v], DMA::D_CTRL->bits_);
+		const u32 back = DMA::D_CTRL->bits_;
+		*DMA::D_CTRL = (DMA::RegCTRLBits)saved;
+		printf("  wrote %08x, read %08x\n", values[v], back);
 	}
-	*DMA::D_CTRL = (DMA::RegCTRLBits)saved;
 }
 
 // What a read of the address and count sees part way through a long transfer.
