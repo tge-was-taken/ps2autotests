@@ -57,21 +57,24 @@ static void testCauseFields(void) {
 
 // Which bits the status register keeps, written with interrupts already off.
 static void testStatusWrites(void) {
-	static const u32 values[] = {0x00000000, 0xFFFFFFFF, 0x0000FF00, 0x00400000,
-	                             0x10000000, 0x00010000};
+	// A value that clears the mode bits or sets the ones the manual reserves
+	// stops the processor, so what is swept is the interrupt mask against the
+	// value the kernel left behind.
+	static const u32 masks[] = {0x00000000, 0x0000FF00, 0x00000100, 0x0000FE00};
 	unsigned i;
 	int state = 0;
 
-	printf("Writing the status register:\n");
+	printf("Writing the interrupt mask in the status register:\n");
 	CpuSuspendIntr(&state);
 	{
 		const u32 saved = READ_COP0(12);
-		for (i = 0; i < sizeof(values) / sizeof(values[0]); ++i) {
+		for (i = 0; i < sizeof(masks) / sizeof(masks[0]); ++i) {
+			const u32 attempt = (saved & ~0x0000FF00u) | masks[i];
 			u32 back;
-			WRITE_COP0(12, values[i]);
+			WRITE_COP0(12, attempt);
 			back = READ_COP0(12);
 			WRITE_COP0(12, saved);
-			printf("  wrote %08x, read %08x\n", values[i], back);
+			printf("  wrote %08x, read %08x\n", attempt, back);
 		}
 		WRITE_COP0(12, saved);
 	}
