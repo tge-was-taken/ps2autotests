@@ -5,27 +5,9 @@
 // The calls that reach into the kernel itself: replacing an entry in its table,
 // flushing the caches, and the entries that manage the address translation.
 
-static int replacementRan;
-
-static void replacementHandler() {
-	replacementRan++;
-}
-
-// Reading an entry back is not part of the interface, so what is recorded is
-// the effect of installing one and putting it back.
-static void testSetSyscall() {
-	// A number in the range the kernel leaves for a program to use.
-	static const s32 numbers[] = {0x10, 0x40, 0x7F, 0x80, -1, -0x40};
-
-	printf("SetSyscall on each number:\n");
-	for (unsigned i = 0; i < sizeof(numbers) / sizeof(numbers[0]); ++i) {
-		replacementRan = 0;
-		SetSyscall(numbers[i], (void *)&replacementHandler);
-		printf("  %5d: installed, handler ran %d times\n", numbers[i], replacementRan);
-		SetSyscall(numbers[i], 0);
-	}
-}
-
+// SetSyscall is not tested here.  A number the kernel already uses is
+// overwritten with no way to read the old entry back and put it there, and the
+// numbers it does not use are what the test would have to know in advance.
 // The cache flush, whose argument picks which of the two to write back.
 static void testFlushCache() {
 	static u32 __attribute__((aligned(64))) buffer[64];
@@ -131,7 +113,6 @@ int main(int argc, char *argv[]) {
 	testTranslation();
 	testProbe();
 	testGraphicsRegisters();
-	testSetSyscall();
 
 
 	printf("-- TEST END\n");
